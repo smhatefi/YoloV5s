@@ -55,8 +55,23 @@ class YOLOv5s(nn.Module):
 
         return y1, y2, y3
 
-# Optional: utility function to load official weights
+# Utility function to load official weights
 def load_official_weights(model, weight_path):
+    # Map the parameter names from the official model to the custom model
+    def rename_params(name):
+        name = name.replace('model.', '')
+        name = name.replace('cv1', 'stem')
+        name = name.replace('cv2', 'conv2')
+        name = name.replace('cv3', 'conv3')
+        name = name.replace('cv4', 'conv4')
+        name = name.replace('cv5', 'conv5')
+        return name
+
     official_weights = torch.load(weight_path, map_location='cpu')['model'].float().state_dict()
-    model.load_state_dict(official_weights, strict=False)
+    new_state_dict = {}
+    for name, param in official_weights.items():
+        new_name = rename_params(name)
+        if new_name in model.state_dict():
+            new_state_dict[new_name] = param
+    model.load_state_dict(new_state_dict, strict=False)
     return model
