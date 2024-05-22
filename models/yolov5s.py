@@ -62,10 +62,7 @@ def load_official_weights(model, weight_path):
 
     new_state_dict = {}
     for k, v in model_weights.items():
-        if 'model.' in k:
-            new_key = k.replace('model.', '')
-        else:
-            new_key = k
+        new_key = k.replace('model.', '')  # Remove 'model.' from keys
         new_state_dict[new_key] = v
 
     model.load_state_dict(new_state_dict, strict=False)
