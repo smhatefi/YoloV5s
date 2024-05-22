@@ -58,14 +58,15 @@ class YOLOv5s(nn.Module):
 # Utility function to load official weights
 def load_official_weights(model, weight_path):
     checkpoint = torch.load(weight_path, map_location='cpu')
-    model_weights = checkpoint['model'].state_dict()
+    model_weights = checkpoint['model'].float().state_dict()
 
     new_state_dict = {}
     for k, v in model_weights.items():
-        name = k
-        if name.startswith('model.'):
-            name = name[6:]  # remove `model.`
-        new_state_dict[name] = v
+        if 'model.' in k:
+            new_key = k.replace('model.', '')
+        else:
+            new_key = k
+        new_state_dict[new_key] = v
 
     model.load_state_dict(new_state_dict, strict=False)
     return model
